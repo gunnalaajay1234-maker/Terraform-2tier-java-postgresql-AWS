@@ -1,0 +1,52 @@
+name: Terraform 2tier Java Postgresql Github actions CI/CD Control
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Type action: start | destroy"
+        required: true
+        default: "start"
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 🔐 AWS Credentials
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      # Terraform Setup
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # Init
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      # PLAN (for start)
+      - name: Terraform Plan
+        if: ${{ github.event.inputs.action == 'start' }}
+        run: terraform plan
+        working-directory: ./terraform
+
+      # APPLY (START = create infra + deploy app)
+      - name: Terraform Apply (Start)
+        if: ${{ github.event.inputs.action == 'start' }}
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+      # DESTROY (delete everything)
+      - name: Terraform Destroy
+        if: ${{ github.event.inputs.action == 'destroy' }}
+        run: terraform destroy -auto-approve
+        working-directory: ./terraform
