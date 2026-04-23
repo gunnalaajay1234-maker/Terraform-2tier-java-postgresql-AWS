@@ -10,8 +10,8 @@ terraform {
 
 provider "aws" {
   region = "ap-south-1"
-  access_key = ${{ secrets.AWS_ACCESS_KEY_ID }}
-  secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  access_key = "ACCESS-KEY"
+  secret_key = "SECRET-KEY"
 }
 
 # This backend block is optional 
