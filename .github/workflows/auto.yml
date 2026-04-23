@@ -31,9 +31,11 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # Init
-      - name: Terraform Init
-        run: terraform init
+      # Terraform Init (handles backend + state migration)
+      - name: Terraform Init (Reconfigure + Migrate State)
+        run: |
+          terraform init -reconfigure
+          terraform init -migrate-state
         working-directory: .
 
       # PLAN (for start)
