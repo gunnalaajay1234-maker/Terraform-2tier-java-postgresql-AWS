@@ -34,22 +34,22 @@ jobs:
       # Init
       - name: Terraform Init
         run: terraform init
-        working-directory: ./terraform
+        working-directory: .
 
       # PLAN (for start)
       - name: Terraform Plan
         if: ${{ github.event.inputs.action == 'start' }}
         run: terraform plan
-        working-directory: ./terraform
+        working-directory: .
 
       # APPLY (START = create infra + deploy app)
       - name: Terraform Apply (Start)
         if: ${{ github.event.inputs.action == 'start' }}
         run: terraform apply -auto-approve
-        working-directory: ./terraform
+        working-directory: .
 
       # DESTROY (delete everything)
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve
-        working-directory: ./terraform
+        working-directory: .
