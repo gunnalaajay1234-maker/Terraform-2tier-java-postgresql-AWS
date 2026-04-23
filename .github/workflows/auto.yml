@@ -40,8 +40,8 @@ jobs:
           rm -f .terraform.lock.hcl
 
       # Terraform Init (FIXED BACKEND)
-      - name: Terraform Init (Reconfigure Backend)
-        run: terraform init -reconfigure
+      - name: Terraform Init 
+        run: terraform init 
         working-directory: .
 
       # Validate
