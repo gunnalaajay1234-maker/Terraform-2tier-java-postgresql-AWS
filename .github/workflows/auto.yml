@@ -1,4 +1,4 @@
-name: Terraform 2tier Java Postgresql Github actions CI/CD Control
+name: Terraform 2-Tier Java PostgreSQL CI/CD
 
 on:
   workflow_dispatch:
@@ -13,13 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout repo
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Check repo structure
+      # Show repo structure (debug)
+      - name: Show Repo Structure
         run: ls -R
 
-      # 🔐 AWS Credentials
+      # AWS Credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -27,37 +29,48 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      # Terraform Setup
+      # Setup Terraform
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # Terraform Init (handles backend + state migration)
-      - name: Terraform Init (Reconfigure + Migrate State)
+      # Clean old cache (VERY IMPORTANT FIX for your error)
+      - name: Clean Terraform Cache
         run: |
-          terraform init -reconfigure
-          terraform init -migrate-state
+          rm -rf .terraform
+          rm -f .terraform.lock.hcl
+
+      # Terraform Init (FIXED BACKEND)
+      - name: Terraform Init (Reconfigure Backend)
+        run: terraform init -reconfigure
         working-directory: .
 
-      # PLAN (for start)
+      # Validate
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: .
+
+      # PLAN (only for start)
       - name: Terraform Plan
         if: ${{ github.event.inputs.action == 'start' }}
         run: terraform plan
         working-directory: .
 
-      # APPLY (START = create infra + deploy app)
-      - name: Terraform Apply (Start)
+      # APPLY (START)
+      - name: Terraform Apply
         if: ${{ github.event.inputs.action == 'start' }}
         run: terraform apply -auto-approve
         working-directory: .
 
-      # DESTROY (delete everything)
-      - name: Show Files (Debug)
+      # DEBUG (optional but helpful)
+      - name: Show State Debug Info
         run: |
-          echo "Runner OS: $(uname -a)"
-          pwd
+          echo "Checking terraform files..."
           ls -R
+          echo "Terraform state info (if exists)"
+          cat terraform.tfstate || echo "No local state file (using S3 backend)"
         working-directory: .
-      
+
+      # DESTROY
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve
