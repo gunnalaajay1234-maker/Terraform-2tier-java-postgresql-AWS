@@ -8,16 +8,11 @@ terraform {
   required_version = ">= 1.5.0"
 }
 
-
-/*
 terraform {
   backend "s3" {
-    bucket         = "my-terraform-state-bucket"   # S3 bucket name
-    key            = "terraform.tfstate"   # path inside bucket
-    region         = "ap-south-1"
+    bucket = "my-bucket"
+    key    = "ec2-vpc/terraform.tfstate"
     dynamodb_table = "terraform-lock-table"        # for state locking
     encrypt        = true
   }
 }
-
-*/
