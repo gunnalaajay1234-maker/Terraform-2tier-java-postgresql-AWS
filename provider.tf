@@ -14,6 +14,8 @@ provider "aws" {
   secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 }
 
+# This backend block is optional 
+# If you want statefile to store in Storage account use it else remove
 terraform {
   backend "s3" {
     bucket         = "saiterrastate"
