@@ -8,6 +8,12 @@ terraform {
   required_version = ">= 1.5.0"
 }
 
+provider "aws" {
+
+  access_key = ${{ secrets.AWS_ACCESS_KEY_ID }}
+  secret_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+}
+
 terraform {
   backend "s3" {
     bucket         = "saiterrastate"
