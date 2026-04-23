@@ -49,6 +49,13 @@ jobs:
         working-directory: .
 
       # DESTROY (delete everything)
+      - name: Show Files (Debug)
+        run: |
+          echo "Runner OS: $(uname -a)"
+          pwd
+          ls -R
+        working-directory: .
+      
       - name: Terraform Destroy
         if: ${{ github.event.inputs.action == 'destroy' }}
         run: terraform destroy -auto-approve
