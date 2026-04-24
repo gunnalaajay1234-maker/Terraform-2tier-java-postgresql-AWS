@@ -1,0 +1,208 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+  branches:
+    include:
+      - master
+
+pr: none
+
+variables:
+- group: awsterragitazure
+
+parameters:
+- name: action
+  displayName: "Type action: start | destroy"
+  type: string
+  default: start
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+# =========================
+# Checkout Code
+# =========================
+- checkout: self
+
+# =========================
+# Show Repo Structure
+# =========================
+- script: |
+    ls -R
+  displayName: "Show Repo Structure"
+
+# =========================
+# AWS Credentials
+# =========================
+- script: |
+    export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+    export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+    export AWS_DEFAULT_REGION=ap-south-1
+  displayName: "Set AWS Credentials"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+trigger:
+  branches:
+    include:
+      - master
+
+pr: none
+
+variables:
+- group: awsterragitazure
+
+parameters:
+- name: action
+  displayName: "Type action: start | destroy"
+  type: string
+  default: start
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+# =========================
+# Checkout Code
+# =========================
+- checkout: self
+
+# =========================
+# Show Repo Structure
+# =========================
+- script: |
+    ls -R
+  displayName: "Show Repo Structure"
+
+# =========================
+# AWS Credentials
+# =========================
+- script: |
+    export AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)
+    export AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)
+    export AWS_DEFAULT_REGION=ap-south-1
+  displayName: "Set AWS Credentials"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+
+- script: |
+    echo "Checking key file..."
+    ls -l ec2-key.pem
+    head -2 ec2-key.pem
+  displayName: "Verify PEM File"
+
+# =========================
+# Setup Terraform
+# =========================
+- task: TerraformInstaller@1
+  displayName: "Install Terraform"
+  inputs:
+    terraformVersion: 'latest'
+
+# =========================
+# Clean Terraform Cache
+# =========================
+- script: |
+    rm -rf .terraform
+    rm -f .terraform.lock.hcl
+  displayName: "Clean Terraform Cache"
+
+- script: aws sts get-caller-identity
+  displayName: "Verify AWS Credentials"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+# =========================
+# Terraform Init
+# =========================
+- script: terraform init -reconfigure
+  displayName: "Terraform Init"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform plan
+  displayName: "Terraform Plan"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform apply -auto-approve
+  displayName: "Terraform Apply"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform destroy -auto-approve
+  displayName: "Terraform Destroy"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+    
+# =========================
+# Setup Terraform
+# =========================
+- task: TerraformInstaller@1
+  displayName: "Install Terraform"
+  inputs:
+    terraformVersion: 'latest'
+
+# =========================
+# Clean Terraform Cache
+# =========================
+- script: |
+    rm -rf .terraform
+    rm -f .terraform.lock.hcl
+  displayName: "Clean Terraform Cache"
+
+- script: aws sts get-caller-identity
+  displayName: "Verify AWS Credentials"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+# =========================
+# Terraform Init
+# =========================
+- script: terraform init -reconfigure
+  displayName: "Terraform Init"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform plan
+  displayName: "Terraform Plan"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform apply -auto-approve
+  displayName: "Terraform Apply"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
+
+- script: terraform destroy -auto-approve
+  displayName: "Terraform Destroy"
+  env:
+    AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+    AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+    AWS_DEFAULT_REGION: ap-south-1
